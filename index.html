@@ -51,8 +51,8 @@
 
             var canvas = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
                    attribution: 'Map data © OpenStreetMap contributors, CC-BY-SA, Imagery © Mapbox',
-                   maxZoom: 4,
                    minZoom: 4,
+                   
                    id: 'mapbox.light',
                    accessToken:'pk.eyJ1IjoiY3VyZW1hbmdvIiwiYSI6ImNpcTQ4cGFwbDAxbmVmd25vZGNiOTVzeGEifQ.GWZByYkIft6eMRha69C8nw'
              }).addTo(map);
@@ -69,15 +69,24 @@
             function style(feature){
                 return {
                     fillColor: getColor(feature.properties.age),   // pop_den is the field name for the population density data
-                    weight: 2,
+                    weight: 1.5,
                     opacity: 1,
                     color: 'gray',
                     fillOpacity: 0.9
                 };
             }
 
-            var state = L.geoJson(state, {style:style}).addTo(map);
-            var county = L.geoJson(county, {style:style}).addTo(map);
+            var state = L.geoJson(state, {style:style
+                        }).bindPopup(function (layer){
+                                return layer.feature.properties.NAME10
+                                + '<p style="color:purple">' + layer.feature.properties.age.toString() + '% </p>';               
+                        }).addTo(map);
+            
+            var county = L.geoJson(county, {style:style
+                        }).bindPopup(function (layer){
+                                return layer.feature.properties.NAMELSAD10
+                                + '<p style="color:purple">' + layer.feature.properties.age.toString() + '% </p>';               
+                        }).addTo(map);
             
             var legend = L.control({position: 'bottomright'}); // Try the other three corners if you like.
 
@@ -86,7 +95,7 @@
                   var div = L.DomUtil.create('div', 'legend'),
                       grades = [0, 1.5, 2, 4, 6]; // The break values to define the intervals of population, note we begin from 0 here
 
-                  div.innerHTML = '<b>Population Density <br> 2011 <br></b>'; // The legend title, in this case it's Population Density 2011
+                  div.innerHTML = '<b>% Aging Population <br>85 and over <br> <br></b>'; // The legend title
 
                   // Loop through our the classes and generate a label with a colored square for each interval.
                   // If you are creating a similar choropleth map, you do not need to change lines below.
@@ -102,7 +111,7 @@
             legend.addTo(map);
             
              var basemaps = {
-                "Light Canvas": canvas,
+                //"Light Canvas": canvas,
             };
 
             var overlaymaps = {
@@ -113,18 +122,18 @@
             L.control.layers(basemaps, overlaymaps).addTo(map);
             
             // Removing the legend when the layer is removed
-            map.on('overlayremove', function(eventLayer){
-              if (eventLayer.name == 'London Boroughs'){ // We use the key/display name to refer to the layer
-                map.removeControl(legend); // legend is the variable name of the layer legend
-              }
-            });
-
-            // Adding the legend when the layer is added
-            map.on('overlayadd', function(eventLayer){
-              if (eventLayer.name == 'London Boroughs'){
-                legend.addTo(map);
-              }
-            });
+//            map.on('overlayremove', function(eventLayer){
+//              if (eventLayer.name == 'London Boroughs'){ // We use the key/display name to refer to the layer
+//                map.removeControl(legend); // legend is the variable name of the layer legend
+//              }
+//            });
+//
+//            // Adding the legend when the layer is added
+//            map.on('overlayadd', function(eventLayer){
+//              if (eventLayer.name == 'London Boroughs'){
+//                legend.addTo(map);
+//              }
+//            });
 
         </script>
    </body>
